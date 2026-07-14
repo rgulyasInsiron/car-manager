@@ -120,8 +120,8 @@ export const SEED_EVENTS: ServiceEvent[] = [
     carId: SEED_CAR.id,
     type: "fekfolyadek",
     title: "Fékfolyadék csere",
-    date: "2024-09-08",
-    odometerKm: 199_500,
+    date: "2024-11-15",
+    odometerKm: 204_000,
     costHuf: 25_000,
   },
   {
