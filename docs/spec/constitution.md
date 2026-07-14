@@ -15,8 +15,9 @@ decision must comply. Conflicts are resolved here first.
 
 ## 2. Scope guardrails
 
-- One car, one user, one locale (Hungarian UI text, `hu-HU` number/date
-  formatting).
+- One user, one locale (Hungarian UI text, `hu-HU` number/date formatting).
+  Multiple cars are in scope since 2026-07-14 (human-approved spec change,
+  see `spec.md` §2a) — still no multi-user, no fleet management.
 - Feature set is fixed by `spec.md`. Anything not in the spec is out of scope
   until a human approves a spec change.
 - No new runtime libraries beyond the approved stack (AGENTS.md rule 3).

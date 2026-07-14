@@ -65,6 +65,28 @@ against these. UI strings are Hungarian; scenario language is English.
 - Then that item gets a "check the manufacturer's schedule" style hint rather
   than a fabricated due date.
 
+## Cars (add & switch)
+
+**S13 — Add a car from the model catalog**
+- Given I open the add-car form via „Új autó"
+- When I pick a model from the model list, enter year 2018 and odometer
+  89 000 and save
+- Then the new car is created and becomes active, and the header shows its
+  name, year, and "89 000 km".
+
+**S14 — Switching cars swaps all dashboard data**
+- Given two cars exist with different histories
+- When I switch the active car in the header select
+- Then the status cards, suggestions, and timeline all show only the selected
+  car's data, and the odometer in the header updates.
+
+**S15 — A new car has an honest empty state**
+- Given a freshly added car with no event history
+- When its dashboard renders
+- Then status cards and suggestions show the careful "check the
+  manufacturer's schedule" hints with no fabricated due dates, and the
+  timeline shows an empty state.
+
 ## Non-functional
 
 **S10 — Deterministic and offline**

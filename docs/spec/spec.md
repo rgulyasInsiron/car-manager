@@ -25,6 +25,10 @@ Workshop demo MVP; see `constitution.md` for scale and guardrails.
 Header:
 - Car name and year (e.g. **Skoda Octavia 1.6 TDI, 2012**).
 - Current odometer reading, prominently displayed (e.g. **236 400 km**).
+- Car switcher: when more than one car exists, a select in the header switches
+  the active car; every dashboard element (status cards, suggestions,
+  timeline) shows the active car's data. An „Új autó" action next to it opens
+  the add-car form (§2a).
 
 Status cards — three large cards, each with a colored status indicator
 (🟢 ok / 🟡 due soon / 🔴 urgent), a title, and the key figure:
@@ -65,6 +69,31 @@ Validation: type and date required; odometer required, positive, and not less
 than the last known reading minus a small tolerance (warn, not block).
 Saving updates the timeline and, when the new odometer is the highest known,
 the dashboard's current-km value.
+
+## 2a. Cars — add and switch
+
+> Scope change (2026-07-14, human): multi-car support approved. The app
+> manages multiple cars for the single demo user; constitution §2 updated
+> accordingly.
+
+The „Új autó" action opens a dialog with the add-car form:
+
+- Modell (select from the seeded **model catalog**, e.g. Skoda Octavia
+  1.6 TDI, VW Golf VII 1.6 TDI, Toyota Corolla 1.8 Hybrid, …)
+- Évjárat (number, required, sane range 1980–current year)
+- Kilométeróra-állás (number, required, positive)
+- Becenév (text, optional — display name defaults to the model name)
+
+Behavior:
+- Saving creates the car, makes it the active car, and shows its dashboard.
+- A newly added car has no event history: status cards and suggestions fall
+  back to the careful "check the manufacturer schedule" hints (§3) — never a
+  fabricated due date; the timeline shows an empty state.
+- The model catalog is curated, versioned demo data; a model may carry its
+  own service-interval table and otherwise falls back to a generic default
+  table.
+- The seeded demo car is always present after a demo reset and cannot be
+  deleted; car deletion is otherwise out of scope for the MVP.
 
 ## 3. Service suggestion engine (rule-based)
 
@@ -109,8 +138,11 @@ The app starts pre-seeded and works without any user setup:
 - Service-interval table for the demo car (e.g. oil 10 000 km / 365 days,
   pollen filter 15 000 km / 365 days, brake fluid 730 days, inspection
   730 days, timing belt per manufacturer guidance).
-- Seed data lives in a versioned module; new events are persisted client-side
-  (see `plan.md`) on top of the seed.
+- Model catalog: a curated list of ~8–10 common models for the add-car form
+  (§2a), each with its own service-interval table or the generic default.
+- Seed data lives in a versioned module; user-added cars and events are
+  persisted client-side (see `plan.md`) on top of the seed. The seeded
+  Octavia is always restored by the demo reset.
 
 ## 5. UI requirements
 
@@ -125,7 +157,8 @@ The app starts pre-seeded and works without any user setup:
 
 ## 6. Out of scope (explicit)
 
-Authentication, multi-user/multi-car, server database (may arrive in a later
+Authentication, multi-user (multi-car moved into scope 2026-07-14, see §2a),
+car deletion, server database (may arrive in a later
 workshop block), notifications, PDF export, service-shop integrations, chat
 UI, native mobile — and, until a human approves an AI API key: **any runtime
 LLM call**, free-text event parsing, photo/receipt OCR.

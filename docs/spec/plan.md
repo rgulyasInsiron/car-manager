@@ -26,6 +26,7 @@ type EventType =
 
 interface ServiceEvent {
   id: string;
+  carId: string;
   type: EventType;
   title: string;          // display label, Hungarian
   date: string;           // ISO yyyy-mm-dd
@@ -34,10 +35,18 @@ interface ServiceEvent {
   note?: string;
 }
 
-interface Car {
+interface CarModel {
+  id: string;
   name: string;           // "Skoda Octavia 1.6 TDI"
+  intervals?: ServiceInterval[]; // falls back to the generic default table
+}
+
+interface Car {
+  id: string;
+  modelId: string;
+  nickname?: string;      // display name defaults to the model name
   year: number;           // 2012
-  currentKm: number;      // max(seed, last event odometer)
+  currentKm: number;      // max(initial reading, last event odometer)
 }
 
 interface ServiceInterval {
@@ -49,11 +58,13 @@ interface ServiceInterval {
 
 ## 3. Persistence (demo-grade, deliberate)
 
-- **Seed data**: `src/lib/data/seed.ts` — the car, ~10 events, and the
-  service-interval table, versioned in the repo (deterministic demo).
-- **User-added events**: `localStorage` on the client, merged over the seed at
-  load (`src/lib/data/store.ts`). A "demo visszaállítása" reset simply clears
-  localStorage.
+- **Seed data**: `src/lib/data/seed.ts` — the demo car, the model catalog,
+  ~10 events, and the service-interval tables (per model + generic default),
+  versioned in the repo (deterministic demo).
+- **User-added cars and events**: `localStorage` on the client, merged over
+  the seed at load (`src/lib/data/store.ts`); the store also keeps
+  `activeCarId`. A "demo visszaállítása" reset simply clears localStorage
+  (seeded Octavia always comes back).
 - **No server database.** Neon/Postgres arrives in a later workshop block;
   the store module is the single seam where it will plug in.
 
@@ -110,3 +121,7 @@ the UI as demo data.
    in later. Research evidence: `research-service-intervals.md` (no free
    source covers EU-market vehicles; EU-covering vendors are
    enterprise-contract only).
+4. ~~Single vs multiple cars~~ — **DECIDED (2026-07-14, human):** multi-car
+   support is in scope: add-car form (model from the curated catalog + year +
+   odometer + optional nickname) and a header car switcher. Still one user,
+   no auth, no car deletion. Spec §2a; constitution §2 updated.
