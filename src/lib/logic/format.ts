@@ -61,3 +61,12 @@ export function addDays(iso: string, days: number): string {
   const date = new Date(parseIsoDate(iso) + days * DAY_MS);
   return date.toISOString().slice(0, 10);
 }
+
+// "Today" as yyyy-mm-dd in LOCAL time. `toISOString().slice(0, 10)` would use
+// UTC, which is yesterday's date between 00:00 and 02:00 CET/CEST.
+export function todayIsoLocal(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
