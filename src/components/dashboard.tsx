@@ -11,10 +11,12 @@ import { fetchState } from "@/lib/data/api-client";
 import { intervalsForModel, MODEL_CATALOG } from "@/lib/data/seed";
 import {
   activeCar,
+  applyCar,
   applyEvent,
   currentKmForCar,
   eventsForCar,
   seedState,
+  setActiveCar,
   type StoreState,
 } from "@/lib/data/store";
 import { costTotals } from "@/lib/logic/costs";
@@ -22,6 +24,8 @@ import { formatKm } from "@/lib/logic/format";
 import { computeItemStatuses, topStatusCards } from "@/lib/logic/status";
 import { buildSuggestions } from "@/lib/logic/suggestions";
 
+import { CarFormDialog } from "./car-form-dialog";
+import { CarSwitcher } from "./car-switcher";
 import { CostsCard } from "./costs-card";
 import { EventFormDialog } from "./event-form-dialog";
 import { StatusCard } from "./status-card";
@@ -64,11 +68,32 @@ export function Dashboard() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 pb-24 md:gap-8 md:p-8 md:pb-28">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">MyCar Logbook</p>
-          <h1 className="text-2xl font-semibold">
-            {carName}, {car.year}
-          </h1>
+        <div className="flex flex-col gap-3">
+          <div>
+            <p className="text-sm text-muted-foreground">MyCar Logbook</p>
+            <h1 className="text-2xl font-semibold">
+              {carName}, {car.year}
+            </h1>
+          </div>
+          {/* Car switcher (spec §1): visible with 2+ cars; switching swaps
+              every dashboard element via setActiveCar (S14). „Új autó" is
+              always available; a saved car becomes active via applyCar
+              (spec §2a, S13). */}
+          <div className="flex flex-wrap items-center gap-2">
+            {state.cars.length >= 2 && (
+              <CarSwitcher
+                cars={state.cars}
+                activeCarId={state.activeCarId}
+                onSelect={(carId) =>
+                  setState((prev) => setActiveCar(prev, carId))
+                }
+              />
+            )}
+            <CarFormDialog
+              currentYear={Number(todayIso.slice(0, 4))}
+              onSaved={(newCar) => setState((prev) => applyCar(prev, newCar))}
+            />
+          </div>
         </div>
         <div className="sm:text-right">
           <p className="text-4xl font-semibold tabular-nums">
