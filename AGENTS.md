@@ -21,6 +21,13 @@ Starter for a small website built with AI-assisted development
 4. Code, comments, and commit messages are English.
 5. Before declaring any task done, run and fix until green:
    `npm run typecheck && npm run lint && npm run test`
+6. Task intake from Linear: only pick up issues in **Todo** state; never
+   pick up issues that are blocked by an open issue. Before starting,
+   validate that the task is sufficiently specified and executable per the
+   expectations in `docs/spec/constitution.md` — if it is not, stop and ask
+   the human instead of guessing. If it is, move the issue to
+   **In Progress** immediately (so no other agent picks it up), then start
+   the work.
 
 > This file grows during the workshop — every recurring correction you give
 > the agent belongs here as a rule.
