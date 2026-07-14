@@ -38,9 +38,8 @@ all copy is advisory, never alarming or diagnostic (constitution §3).
   emoji (the spec's 🟢/🟡/🔴 is shorthand for these tokens).
 - **Dark mode:** follows the system (spec §5): the dark token block and the
   `dark:` variant in `globals.css` key off the `prefers-color-scheme` media
-  query — there is no `.dark` class and no toggle. Token values are unchanged.
-  Every custom color must be legible in both themes — the `dark:` variants
-  above are mandatory.
+  query — there is no `.dark` class and no toggle. Every custom color must be
+  legible in both themes — the `dark:` variants above are mandatory.
 
 ## Typography
 
