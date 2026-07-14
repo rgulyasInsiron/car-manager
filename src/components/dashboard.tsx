@@ -5,14 +5,13 @@
 // delta via fetchState() and computes everything with the pure logic in
 // src/lib/logic — today's date is always an explicit input (S10).
 
-import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { fetchState } from "@/lib/data/api-client";
 import { intervalsForModel, MODEL_CATALOG } from "@/lib/data/seed";
 import {
   activeCar,
+  applyEvent,
   currentKmForCar,
   eventsForCar,
   seedState,
@@ -24,6 +23,7 @@ import { computeItemStatuses, topStatusCards } from "@/lib/logic/status";
 import { buildSuggestions } from "@/lib/logic/suggestions";
 
 import { CostsCard } from "./costs-card";
+import { EventFormDialog } from "./event-form-dialog";
 import { StatusCard } from "./status-card";
 import { SuggestionsCard } from "./suggestions-card";
 import { TimelineCard } from "./timeline-card";
@@ -103,16 +103,15 @@ export function Dashboard() {
 
       <TimelineCard events={events} />
 
-      {/* New-event FAB: present and reachable on every viewport (S12); the
-          event form dialog is wired in T4 — until then it is a no-op. */}
-      <Button
-        type="button"
-        aria-label="Új esemény rögzítése"
-        title="Új esemény rögzítése"
-        className="fixed right-6 bottom-6 size-14 rounded-full shadow-lg"
-      >
-        <Plus className="size-6" aria-hidden />
-      </Button>
+      {/* New-event FAB + dialog (T4, spec §2): saves attach to the active
+          car; applying the saved event to state recomputes timeline, status
+          cards, suggestions, and costs (S4, S8). */}
+      <EventFormDialog
+        carId={car.id}
+        currentKm={currentKm}
+        todayIso={todayIso}
+        onSaved={(event) => setState((prev) => applyEvent(prev, event))}
+      />
     </div>
   );
 }
