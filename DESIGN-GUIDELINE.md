@@ -7,29 +7,107 @@ is still a section: it tells the agent that the decision is still open.
 > You may write your VALUES in Hungarian if that feels more comfortable —
 > English is recommended, as models follow English instructions best.
 
+> Decided 2026-07-14 for MyCar Logbook (human-delegated decision, recorded in
+> plan.md §8/7). Material Design–inspired, implemented purely with the
+> existing Tailwind + shadcn/ui stack (constitution §2: no MUI).
+
 ## Brand & tone
 
-<!-- What is the site's mood? (e.g. playful / professional / minimalist) -->
+Calm, trustworthy, workshop-clean. A digital service book: information-dense
+but never cluttered — the dashboard must answer "what happened / what's next /
+what state" at a single glance (spec §5). UI language is Hungarian; tone of
+all copy is advisory, never alarming or diagnostic (constitution §3).
 
 ## Colors
 
-<!-- Primary / secondary colors. Use Tailwind tokens, e.g. `bg-emerald-600`. -->
+- **Base palette:** the starter's neutral oklch tokens in `globals.css` are
+  the single source of truth (`bg-background`, `text-foreground`, `bg-card`,
+  `text-muted-foreground`, `border-border`, …). Do not add new base colors.
+- **Primary** stays the neutral near-black/near-white token (`bg-primary`) —
+  buttons and the FAB use it. The app's visual character comes from the
+  status palette, not from a brand hue.
+- **Status palette** (the only chromatic accents; always paired with an icon
+  or label, never color alone):
+  | Severity (`src/lib/logic/status.ts`) | Foreground | Soft background | Dot |
+  |---|---|---|---|
+  | `ok` | `text-emerald-600 dark:text-emerald-400` | `bg-emerald-500/10` | `bg-emerald-500` |
+  | `due-soon` | `text-amber-600 dark:text-amber-400` | `bg-amber-500/10` | `bg-amber-500` |
+  | `urgent` | `text-red-600 dark:text-red-400` | `bg-red-500/10` | `bg-red-500` |
+  | `unknown` | `text-muted-foreground` | `bg-muted` | `bg-muted-foreground` |
+- Status is shown as a colored dot / `Badge` chip + text, NOT as literal
+  emoji (the spec's 🟢/🟡/🔴 is shorthand for these tokens).
+- **Dark mode:** follows the system (`prefers-color-scheme`) via the existing
+  `.dark` tokens (spec §5). No toggle. Every custom color must be legible in
+  both themes — the `dark:` variants above are mandatory.
 
 ## Typography
 
-<!-- Font families and the size scale. Default: Geist (already wired up in the layout). -->
+- **Family:** Geist (`font-sans`) for everything; `font-heading` (already
+  mapped to Geist) for card titles. Geist Mono only for odometer/date values
+  if tabular alignment is ever insufficient — prefer `tabular-nums` first.
+- **Scale:**
+  - App/page title: `text-2xl font-semibold`
+  - Hero figure (current odometer): `text-4xl font-semibold tabular-nums`
+  - Card title: `text-base font-medium` (shadcn CardTitle default)
+  - Key figure on status cards: `text-lg font-semibold tabular-nums`
+  - Body / list rows: `text-sm`
+  - Secondary metadata (dates, costs on the timeline): `text-xs text-muted-foreground`
+- All numbers (km, Ft, days) come from `src/lib/logic/format.ts` — never
+  hand-format numbers or dates in components.
 
 ## Layout & spacing
 
-<!-- Max width, spacing rhythm, mobile-first rules. -->
+- Mobile-first. Single column below `md`; the dashboard is `max-w-5xl mx-auto`
+  with `p-4 md:p-8`.
+- Status cards: `grid gap-4 md:grid-cols-3`. Suggestions + costs cards side
+  by side on `lg` (`lg:grid-cols-[2fr_1fr]`), stacked below.
+- Vertical rhythm: `gap-4` inside sections, `gap-6 md:gap-8` between sections.
+- FAB: `fixed bottom-6 right-6 size-14 rounded-full shadow-lg` using the
+  primary Button; must stay reachable on every viewport (S12).
+- Elevation, Material-style: cards are the elevated surface (shadcn Card's
+  ring + `shadow-sm`); dialogs use the default shadcn overlay. No nested
+  cards.
 
 ## Components
 
-<!-- Which shadcn component is used for what; rules for custom variants. -->
+- Building blocks come from `src/components/ui/` only; missing ones are added
+  with `npx shadcn@latest add <component>` (AGENTS.md rule 2). Expected set:
+  `dialog`, `select`, `input`, `textarea`, `badge`, `separator`, `sonner`
+  (+ existing `button`, `card`).
+- Mapping:
+  - Status cards / suggestions / costs / timeline container → `Card`
+  - New-event and new-car forms → `Dialog` (sheet-like on mobile is fine)
+  - Esemény típusa, modell, autóváltó → `Select`
+  - Status chip → `Badge` with the status palette above
+  - Save/confirm feedback + odometer-regression warning confirm → `sonner`
+    toast / `Dialog` confirm
+- Icons: **lucide-react** (the stack's icon library). Event-type mapping —
+  use these consistently everywhere (timeline, cards, form):
+  `olajcsere→Droplets`, `szurocsere→Fan`, `fekbetet→Disc`,
+  `fekfolyadek→FlaskConical`, `muszaki_vizsga→ShieldCheck`,
+  `vezerles→Cog`, `egyeb→Wrench`.
+- Motion: subtle only — the stock tw-animate-css enter/exit on dialogs and a
+  gentle fade/slide on newly added timeline rows. No decorative animation.
+- Timeline: vertical list with icon, title, `odometer km · date`, cost on the
+  right; reverse-chronological; scrollable within its card; empty state per
+  S15.
 
 ## Don'ts
 
-<!-- What the agent must NEVER do in the UI (e.g. inline styles, new UI libraries). -->
+- No new UI libraries — specifically **no MUI** (constitution §2) and no
+  icon set other than lucide.
+- No inline `style=` attributes; no raw hex/oklch colors in components —
+  Tailwind tokens and the status palette table only.
+- Never communicate status by color alone (add dot+label or icon) — and no
+  emoji as UI elements.
+- No hand-rolled number/date formatting in components — use
+  `src/lib/logic/format.ts`.
+- Don't restyle `src/components/ui/` primitives ad hoc; extend via variants
+  and record the decision here.
+- No layout that breaks S12: no horizontal scrolling at 375 px, FAB always
+  visible.
+- Any new token or component rule an agent introduces MUST be written back
+  into this file in the same change.
 
 ---
 

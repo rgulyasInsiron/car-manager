@@ -158,3 +158,9 @@ the UI as demo data.
    deterministic seed + no AI stays; offline-first is relaxed. New task T7
    (ROL-13) ordered T2 → T7 → T3. `@neondatabase/serverless` approved as a
    runtime dependency (constitution §2 exception).
+7. ~~Design tokens~~ — **DECIDED (2026-07-14, human — delegated to the
+   agent):** `DESIGN-GUIDELINE.md` filled: neutral starter base palette kept,
+   chromatic accents limited to the status palette (emerald/amber/red soft
+   backgrounds + dots, dark variants mandatory), Geist with a fixed type
+   scale and `tabular-nums`, `max-w-5xl` mobile-first grid, shadcn component
+   mapping + lucide event-icon set, subtle-motion and no-color-alone rules.
