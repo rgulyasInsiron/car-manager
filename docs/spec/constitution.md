@@ -57,8 +57,12 @@ decision must comply. Conflicts are resolved here first.
 ## 5. Role boundaries
 
 - The **human** approves: this spec package, design tokens, external-facing
-  steps (push, deploy, API keys, cost).
+  steps (push to `main`, merge, deploy, API keys, cost). Amendment
+  (2026-07-14): pushing task branches and opening PRs is pre-authorized for
+  agents per `docs/agents/orchestration.md`; merging to `main` stays human.
 - The **coding agent** implements only within the approved spec and repo
-  rules; it may not widen its own mandate.
+  rules; it may not widen its own mandate. Orchestrated multi-agent
+  execution follows `docs/agents/orchestration.md` (orchestrator-only
+  intake, maker/reviewer separation, 2-round fix limit, escalation).
 - An **independent reviewer** (CI + second harness / human review) judges the
   result against this package, not against the maker's intent.

@@ -27,7 +27,8 @@ Starter for a small website built with AI-assisted development
    expectations in `docs/spec/constitution.md` — if it is not, stop and ask
    the human instead of guessing. If it is, move the issue to
    **In Progress** immediately (so no other agent picks it up), then start
-   the work.
+   the work. In orchestrated mode ONLY the orchestrator does intake — full
+   protocol: `docs/agents/orchestration.md`.
 
 > This file grows during the workshop — every recurring correction you give
 > the agent belongs here as a rule.
