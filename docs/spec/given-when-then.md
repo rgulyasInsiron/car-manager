@@ -48,10 +48,10 @@ against these. UI strings are Hungarian; scenario language is English.
 **S7 — Suggestions are grounded in the history**
 - Given the seeded history and current odometer 236 400 km
 - When the "Következő javasolt szervizek" card renders
-- Then it shows 3–5 short Hungarian bullet recommendations consistent with the
-  history (e.g. oil change expected in ~2 000 km; timing belt last done at
-  175 000 km), phrased as advice, with no diagnosis claims and no invented
-  events.
+- Then it shows up to 5 short Hungarian bullet recommendations in descending
+  urgency, consistent with the history (e.g. oil change expected in ~8 600 km;
+  timing belt last done at 175 000 km), phrased as advice, with no diagnosis
+  claims and no invented events.
 
 **S8 — Suggestions react to new events**
 - Given the suggestions card shows the oil change as due soon
@@ -64,6 +64,21 @@ against these. UI strings are Hungarian; scenario language is English.
 - When the suggestions are computed
 - Then that item gets a "check the manufacturer's schedule" style hint rather
   than a fabricated due date.
+
+**S16 — Cost summary card sums real costs only**
+- Given the seeded history where some events have a cost and some do not
+- When the „Szervizköltségek" card renders
+- Then the current-year and all-time totals equal the exact sums of the
+  events that have a cost, formatted with `hu-HU` grouping (e.g. „45 000 Ft"),
+  and events without a cost are excluded.
+
+**S17 — Km-based suggestions carry a date estimate**
+- Given the seeded history with at least two odometer readings spanning at
+  least 30 days
+- When the suggestions are computed
+- Then km-based recommendations also include an approximate due date phrased
+  as an estimate („várhatóan … körül"); and given fewer than two readings or
+  a span under 30 days, no date estimate appears.
 
 ## Cars (add & switch)
 

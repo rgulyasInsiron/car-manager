@@ -31,7 +31,11 @@ Header:
   the add-car form (§2a).
 
 Status cards — three large cards, each with a colored status indicator
-(🟢 ok / 🟡 due soon / 🔴 urgent), a title, and the key figure:
+(🟢 ok / 🟡 due soon / 🔴 urgent), a title, and the key figure. The three
+cards are the **3 most urgent tracked items** of the active car (ties broken
+by a fixed priority order: műszaki vizsga, motorolaj, fékfolyadék, fékbetét,
+vezérlés, pollenszűrő, egyéb); items with no history show the careful
+no-history hint (§3). Example:
 
 | Card | Example content |
 |---|---|
@@ -41,15 +45,22 @@ Status cards — three large cards, each with a colored status indicator
 
 Status thresholds (distance-based items, from remaining km): 🟢 > 3 000 km,
 🟡 ≤ 3 000 km, 🔴 ≤ 500 km or overdue. Time-based items (from remaining days):
-🟢 > 60 days, 🟡 ≤ 60 days, 🔴 ≤ 45 days or overdue. Values derive from the
-event history + the service-interval table (§3).
+🟢 > 60 days, 🟡 ≤ 60 days, 🔴 ≤ 45 days or overdue. Items tracked by both
+km **and** days get the more severe of the two statuses. Values derive from
+the event history + the service-interval table (§3).
 
 Service suggestions card — see §3.
 
-Timeline — „Legutóbbi események": reverse-chronological list of events, each
-showing type icon, title, odometer, date, and cost when known. Example items:
-Olajcsere (235 000 km, 2026.07.14), Pollenszűrő csere, Fékbetét csere,
-Műszaki vizsga.
+Cost summary card — **„Szervizköltségek"**: the active car's current-year and
+all-time service cost totals, computed from events that have a cost (events
+without a cost are excluded from the sums), formatted as `45 000 Ft`
+(`hu-HU` grouping).
+
+Timeline — „Legutóbbi események": reverse-chronological list of the active
+car's events, each showing type icon, title, odometer, date, and cost when
+known (formatted as `45 000 Ft`). All events are listed (scrollable); a car
+with no events shows an empty state. Example items: Olajcsere (235 000 km,
+2026.07.14), Pollenszűrő csere, Fékbetét csere, Műszaki vizsga.
 
 Floating action button — a „+" FAB fixed to the bottom-right corner opens the
 new-event form.
@@ -65,10 +76,12 @@ The FAB opens a dialog/sheet with the event form:
 - Költség (number, HUF, optional)
 - Megjegyzés (textarea, optional)
 
-Validation: type and date required; odometer required, positive, and not less
-than the last known reading minus a small tolerance (warn, not block).
-Saving updates the timeline and, when the new odometer is the highest known,
-the dashboard's current-km value.
+Validation: type and date required; odometer required and positive. Any
+odometer below the active car's last known reading (zero tolerance) triggers
+a visible warning but can be confirmed and saved — this is how old events are
+backfilled. The event is always recorded for the **active car**. Saving
+updates the timeline and, when the new odometer is the highest known, the
+dashboard's current-km value.
 
 ## 2a. Cars — add and switch
 
@@ -93,7 +106,9 @@ Behavior:
   own service-interval table and otherwise falls back to a generic default
   table.
 - The seeded demo car is always present after a demo reset and cannot be
-  deleted; car deletion is otherwise out of scope for the MVP.
+  deleted; car deletion is otherwise out of scope for the MVP. The „demo
+  visszaállítása" reset clears **all** user data — added events and added
+  cars alike (full localStorage clear); only the seed remains.
 
 ## 3. Service suggestion engine (rule-based)
 
@@ -109,8 +124,15 @@ Logic (pure, deterministic, unit-tested):
   recommendation sentence from templates.
 - Items never seen in the history produce a "check the manufacturer
   schedule" style hint instead of a fabricated due date.
+- **Date estimate for km-based items:** from the first and last known
+  odometer readings compute the average daily km; when the history has at
+  least 2 readings spanning at least 30 days, km-based recommendations also
+  include an approximate due date („várhatóan 2026. október körül").
+  Otherwise no date estimate is shown. Deterministic (today's date is an
+  input) and always phrased as an estimate.
 
-Output: 3–5 bullet recommendations. Example tone:
+Output: up to 5 bullet recommendations, ordered by descending urgency.
+Example tone:
 
 - „A motorolaj cseréje várhatóan kb. 2 000 km múlva lesz esedékes."
 - „A pollenszűrő több mint egy éve nem volt cserélve."
@@ -137,7 +159,10 @@ The app starts pre-seeded and works without any user setup:
   examples in §1.
 - Service-interval table for the demo car (e.g. oil 10 000 km / 365 days,
   pollen filter 15 000 km / 365 days, brake fluid 730 days, inspection
-  730 days, timing belt per manufacturer guidance).
+  730 days, timing belt per manufacturer guidance). The table records that
+  the demo car follows the **fixed service regime** (owner's manual baseline:
+  15 000 km / 1 year; the seed uses the curated, more conservative values
+  above), and each row carries its source (plan §8/3).
 - Model catalog: a curated list of ~8–10 common models for the add-car form
   (§2a), each with its own service-interval table or the generic default.
 - Seed data lives in a versioned module; user-added cars and events are
@@ -152,13 +177,16 @@ The app starts pre-seeded and works without any user setup:
   `npx shadcn@latest add <component>`.
 - Responsive: single column on mobile, multi-column dashboard on desktop;
   FAB stays reachable on all sizes.
+- Theme follows the system setting (`prefers-color-scheme`) using the
+  starter's existing `.dark` tokens; no manual theme toggle.
 - The dashboard must communicate at a glance: what happened, what comes next,
   what state the car is in.
 
 ## 6. Out of scope (explicit)
 
 Authentication, multi-user (multi-car moved into scope 2026-07-14, see §2a),
-car deletion, server database (may arrive in a later
+car deletion, event editing/deletion, JSON export/import, timeline
+filtering, manual theme toggle, server database (may arrive in a later
 workshop block), notifications, PDF export, service-shop integrations, chat
 UI, native mobile — and, until a human approves an AI API key: **any runtime
 LLM call**, free-text event parsing, photo/receipt OCR.

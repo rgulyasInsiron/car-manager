@@ -73,10 +73,15 @@ interface ServiceInterval {
 - `src/lib/logic/status.ts` — pure functions: for each tracked item compute
   remaining km / days from history + intervals, and map to 🟢/🟡/🔴 per the
   thresholds in `spec.md` §1.
-- `src/lib/logic/suggestions.ts` — pure function producing 3–5 Hungarian
-  recommendation sentences from templates over the same computation; items
-  with no history produce the careful "check the manufacturer schedule" hint
-  (never a fabricated due date).
+- `src/lib/logic/suggestions.ts` — pure function producing up to 5 Hungarian
+  recommendation sentences (descending urgency) from templates over the same
+  computation; items with no history produce the careful "check the
+  manufacturer schedule" hint (never a fabricated due date). Km-based items
+  get an approximate due date from the average-daily-km estimate (first→last
+  known reading; requires ≥ 2 readings spanning ≥ 30 days, otherwise no
+  estimate).
+- `src/lib/logic/costs.ts` — pure cost aggregation: current-year and all-time
+  totals per car from events that have a cost.
 - Both are **unit-tested with boundary cases** — this is the demo's testable
   heart, and deliberately deterministic (S10).
 
@@ -125,3 +130,12 @@ the UI as demo data.
    support is in scope: add-car form (model from the curated catalog + year +
    odometer + optional nickname) and a header car switcher. Still one user,
    no auth, no car deletion. Spec §2a; constitution §2 updated.
+5. ~~Spec completeness pass~~ — **DECIDED (2026-07-14, human):** gap-closing
+   clarifications (worst-of-two status for km+days items, top-3-most-urgent
+   cards, suggestion ordering, zero odometer tolerance with confirmable
+   warning, active-car scoping, `45 000 Ft` formatting, full-timeline +
+   empty state, reset clears added cars, fixed service regime recorded in
+   seed, system-following dark mode) plus two additions: **cost summary
+   card** (S16) and **date estimate on km-based suggestions** (S17).
+   Rejected for the MVP: event editing/deletion, JSON export/import,
+   timeline filtering, manual theme toggle, VIN prefill (spec §6/§7).

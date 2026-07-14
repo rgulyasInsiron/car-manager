@@ -17,15 +17,20 @@ Unit tests for merge, odometer derivation, and per-car scoping.
 *Covers spec §4; S1 data.*
 
 ## T2 — Status + suggestion logic
-`src/lib/logic/status.ts` and `src/lib/logic/suggestions.ts` pure functions:
-remaining km/days, 🟢/🟡/🔴 mapping, Hungarian recommendation sentences,
-"no history" careful hint. Unit tests incl. boundary values.
-*Covers spec §1 thresholds + §3; S2, S7, S9 logic.*
+`src/lib/logic/status.ts`, `src/lib/logic/suggestions.ts`, and
+`src/lib/logic/costs.ts` pure functions: remaining km/days, 🟢/🟡/🔴 mapping
+(worst-of-two for km+days items), top-3 card selection, Hungarian
+recommendation sentences in descending urgency, "no history" careful hint,
+average-daily-km date estimate (≥ 2 readings spanning ≥ 30 days), cost
+totals (current-year + all-time). Unit tests incl. boundary values.
+*Covers spec §1 thresholds + §3; S2, S7, S9, S16, S17 logic.*
 
 ## T3 — Dashboard UI
-Car header, three status cards, suggestions card, timeline with icons, FAB.
-Hungarian labels, `hu-HU` formatting, responsive layout. Uses T1+T2.
-*Covers S1, S2, S3, S7, S10, S12.*
+Car header, three status cards (top-3 most urgent), suggestions card, cost
+summary card („Szervizköltségek"), timeline with icons, FAB. Hungarian
+labels, `hu-HU` formatting (`236 400 km`, `45 000 Ft`), responsive layout,
+theme follows system dark mode. Uses T1+T2.
+*Covers S1, S2, S3, S7, S10, S12, S16.*
 
 ## T4 — Manual event form
 FAB opens dialog with the event form (type/date/km/cost/note), validation,
