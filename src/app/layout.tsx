@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // Change these to your own site's title and description.
-  title: "My Website",
-  description: "Built from zero with AI-assisted development.",
+  title: "MyCar Logbook",
+  description:
+    "Szervizesemények naplózása és karbantartási javaslatok egy pillantásra.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="hu"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

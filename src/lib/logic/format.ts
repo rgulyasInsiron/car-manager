@@ -18,6 +18,11 @@ export function formatHuf(n: number): string {
   return `${formatNumberHu(n)}${NBSP}Ft`;
 }
 
+// "2026.07.14" — full-date display per spec §0 (e.g. on the timeline).
+export function formatDateHu(isoDate: string): string {
+  return isoDate.split("-").join(".");
+}
+
 const HU_MONTHS = [
   "január",
   "február",
