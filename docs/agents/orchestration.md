@@ -63,7 +63,9 @@ resolve (rebase on main before handoff).
 4. Commit(s) on the task branch (English, focused; reference the ROL id).
 5. Write the **handoff file**: `workshop-evidence/handoffs/ROL-<n>.md`
    (template in §7), commit it on the branch.
-6. Return control to the orchestrator (summary = handoff file path + branch
+6. **Teardown, then return**: stop every process the maker started (dev
+   servers, watchers, background jobs) so the worktree is quiescent, then
+   return control to the orchestrator (summary = handoff file path + branch
    + head SHA).
 
 ## 5. Review protocol
@@ -84,6 +86,8 @@ The reviewer:
    - **minor** — style, naming, small cleanup, nice-to-have.
 4. Verdict: `APPROVE` (no critical/major) or `NEEDS_FIX` (any
    critical/major). Findings are posted as a Linear comment on the issue.
+5. Before returning the verdict: stop every process it started (dev servers
+   included) — same teardown rule as §4 step 6.
 
 ## 6. Verdict handling (orchestrator)
 
