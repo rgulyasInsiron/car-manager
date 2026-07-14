@@ -41,7 +41,7 @@ export function TimelineCard({ events }: { events: ServiceEvent[] }) {
                     </p>
                   </div>
                   {event.costHuf !== undefined && (
-                    <p className="shrink-0 text-sm font-medium tabular-nums">
+                    <p className="shrink-0 text-xs text-muted-foreground tabular-nums">
                       {formatHuf(event.costHuf)}
                     </p>
                   )}
