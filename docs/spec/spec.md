@@ -178,8 +178,8 @@ The app starts pre-seeded and works without any user setup:
   `npx shadcn@latest add <component>`.
 - Responsive: single column on mobile, multi-column dashboard on desktop;
   FAB stays reachable on all sizes.
-- Theme follows the system setting (`prefers-color-scheme`) using the
-  starter's existing `.dark` tokens; no manual theme toggle.
+- Theme follows the system setting: the dark token block in `globals.css`
+  keys off the `prefers-color-scheme` media query; no manual theme toggle.
 - The dashboard must communicate at a glance: what happened, what comes next,
   what state the car is in.
 
