@@ -28,17 +28,19 @@ all copy is advisory, never alarming or diagnostic (constitution §3).
   status palette, not from a brand hue.
 - **Status palette** (the only chromatic accents; always paired with an icon
   or label, never color alone):
-  | Severity (`src/lib/logic/status.ts`) | Foreground | Soft background | Dot |
-  |---|---|---|---|
-  | `ok` | `text-emerald-600 dark:text-emerald-400` | `bg-emerald-500/10` | `bg-emerald-500` |
-  | `due-soon` | `text-amber-600 dark:text-amber-400` | `bg-amber-500/10` | `bg-amber-500` |
-  | `urgent` | `text-red-600 dark:text-red-400` | `bg-red-500/10` | `bg-red-500` |
-  | `unknown` | `text-muted-foreground` | `bg-muted` | `bg-muted-foreground` |
+  | Severity (`src/lib/logic/status.ts`) | Foreground | Soft background | Dot | Chip label (`src/components/severity.ts`) |
+  |---|---|---|---|---|
+  | `ok` | `text-emerald-600 dark:text-emerald-400` | `bg-emerald-500/10` | `bg-emerald-500` | Rendben |
+  | `due-soon` | `text-amber-600 dark:text-amber-400` | `bg-amber-500/10` | `bg-amber-500` | Hamarosan |
+  | `urgent` | `text-red-600 dark:text-red-400` | `bg-red-500/10` | `bg-red-500` | Sürgős |
+  | `unknown` | `text-muted-foreground` | `bg-muted` | `bg-muted-foreground` | Nincs adat |
 - Status is shown as a colored dot / `Badge` chip + text, NOT as literal
   emoji (the spec's 🟢/🟡/🔴 is shorthand for these tokens).
-- **Dark mode:** follows the system (`prefers-color-scheme`) via the existing
-  `.dark` tokens (spec §5). No toggle. Every custom color must be legible in
-  both themes — the `dark:` variants above are mandatory.
+- **Dark mode:** follows the system (spec §5): the dark token block and the
+  `dark:` variant in `globals.css` key off the `prefers-color-scheme` media
+  query — there is no `.dark` class and no toggle. Token values are unchanged.
+  Every custom color must be legible in both themes — the `dark:` variants
+  above are mandatory.
 
 ## Typography
 
@@ -63,7 +65,9 @@ all copy is advisory, never alarming or diagnostic (constitution §3).
   by side on `lg` (`lg:grid-cols-[2fr_1fr]`), stacked below.
 - Vertical rhythm: `gap-4` inside sections, `gap-6 md:gap-8` between sections.
 - FAB: `fixed bottom-6 right-6 size-14 rounded-full shadow-lg` using the
-  primary Button; must stay reachable on every viewport (S12).
+  primary Button; must stay reachable on every viewport (S12). FAB clearance:
+  the page container reserves bottom padding (`pb-24 md:pb-28`) so the fixed
+  FAB never covers the last timeline row.
 - Elevation, Material-style: cards are the elevated surface (shadcn Card's
   ring + `shadow-sm`); dialogs use the default shadcn overlay. No nested
   cards.

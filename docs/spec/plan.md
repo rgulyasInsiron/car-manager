@@ -164,3 +164,5 @@ the UI as demo data.
    backgrounds + dots, dark variants mandatory), Geist with a fixed type
    scale and `tabular-nums`, `max-w-5xl` mobile-first grid, shadcn component
    mapping + lucide event-icon set, subtle-motion and no-color-alone rules.
+   `lucide-react` is part of this approved decision as the stack's icon
+   library (runtime dependency; constitution §2 exception).
