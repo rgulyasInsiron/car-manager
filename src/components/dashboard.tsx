@@ -18,7 +18,7 @@ import {
   type StoreState,
 } from "@/lib/data/store";
 import { costTotals } from "@/lib/logic/costs";
-import { formatKm } from "@/lib/logic/format";
+import { formatKm, todayIsoLocal } from "@/lib/logic/format";
 import { computeItemStatuses, topStatusCards } from "@/lib/logic/status";
 import { buildSuggestions } from "@/lib/logic/suggestions";
 
@@ -34,7 +34,7 @@ export function Dashboard() {
   // unreachable, the seed stays visible with an advisory note — no crash.
   const [state, setState] = useState<StoreState>(seedState);
   const [loadError, setLoadError] = useState(false);
-  const [todayIso] = useState(() => new Date().toISOString().slice(0, 10));
+  const [todayIso] = useState(() => todayIsoLocal());
 
   useEffect(() => {
     let cancelled = false;
