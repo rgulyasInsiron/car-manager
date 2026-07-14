@@ -23,8 +23,9 @@ decision must comply. Conflicts are resolved here first.
 - No new runtime libraries beyond the approved stack (AGENTS.md rule 3).
   Specifically: **no Material UI (MUI) package** — the Material Design look is
   achieved with the existing Tailwind + shadcn/ui stack. Human-approved
-  exception (2026-07-14): `@neondatabase/serverless` for the Neon
-  persistence (plan §8/6).
+  exceptions (2026-07-14): `@neondatabase/serverless` for the Neon
+  persistence (plan §8/6), and `lucide-react` as the icon library mandated
+  by `DESIGN-GUIDELINE.md` (plan §8/7).
 
 ## 3. Suggestion principles
 
