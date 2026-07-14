@@ -9,9 +9,10 @@ constitution's guardrails. No runtime AI/LLM (decided 2026-07-14).
   - `/` — dashboard (car header, status cards, suggestions card, timeline,
     FAB)
   - New-event form as a client-side dialog/sheet opened by the FAB.
-- **No API routes needed**: all logic is client-side pure computation over
-  seed + localStorage data. (If the interval-source research lands on an
-  external API, a single thin route would be added behind the same seam.)
+- **Thin API routes** (scope change 2026-07-14): route handlers under
+  `src/app/api/` persist user data to Neon — `GET /api/state`,
+  `POST /api/events`, `POST /api/cars`, `POST /api/reset`. All status/
+  suggestion/cost logic stays client-side pure computation.
 - **Suggestion seam**: the suggestion engine is exposed through one small
   interface (`suggestServices(history, car, intervals, today)`), so a later
   LLM- or external-API-backed implementation can replace the rule engine
@@ -56,17 +57,26 @@ interface ServiceInterval {
 }
 ```
 
-## 3. Persistence (demo-grade, deliberate)
+## 3. Persistence (Neon Postgres — decided 2026-07-14)
 
 - **Seed data**: `src/lib/data/seed.ts` — the demo car, the model catalog,
   ~10 events, and the service-interval tables (per model + generic default),
-  versioned in the repo (deterministic demo).
-- **User-added cars and events**: `localStorage` on the client, merged over
-  the seed at load (`src/lib/data/store.ts`); the store also keeps
-  `activeCarId`. A "demo visszaállítása" reset simply clears localStorage
-  (seeded Octavia always comes back).
-- **No server database.** Neon/Postgres arrives in a later workshop block;
-  the store module is the single seam where it will plug in.
+  versioned in the repo (deterministic demo). The seed is NOT in the
+  database.
+- **User-added cars and events**: **Neon Postgres** (project
+  `car-manager` / `wild-mode-78781588`, tables `cars` + `service_events`,
+  no FK to the code-resident seed car). `DATABASE_URL` in `.env`
+  (gitignored) and in the Vercel project env. Driver:
+  `@neondatabase/serverless` (human-approved runtime dependency).
+- **Flow**: the browser loads `GET /api/state` (user delta) and merges it
+  over the seed via the pure `mergeUserData` (`src/lib/data/store.ts`);
+  mutations go through `POST /api/events|cars`; ids are generated
+  server-side (`buildEvent`/`buildCar`). Active-car selection stays
+  client-side UI state.
+- **Reset**: „demo visszaállítása" = `POST /api/reset` deletes all user
+  rows; the seeded Octavia always comes back.
+- The original localStorage layer was replaced behind the same store seam;
+  offline-first is relaxed accordingly (S10 revised).
 
 ## 4. Status & suggestion logic (the core)
 
@@ -108,8 +118,11 @@ the UI as demo data.
 ## 7. Testing strategy
 
 - Unit tests (Vitest): status computation, suggestion sentences, date/km
-  math, store merge logic, odometer-regression warning rule.
-- No network in tests; everything deterministic.
+  math, store merge logic, row↔model mappers, record builders,
+  odometer-regression warning rule.
+- No network in tests; everything deterministic. The Neon-backed routes and
+  the fetch client are exercised end-to-end against the live database
+  manually / in demo passes, not in unit tests.
 - Gates: `typecheck && lint && test` locally and in CI; build must pass.
 
 ## 8. Risks / open decisions (human gates)
@@ -139,3 +152,9 @@ the UI as demo data.
    card** (S16) and **date estimate on km-based suggestions** (S17).
    Rejected for the MVP: event editing/deletion, JSON export/import,
    timeline filtering, manual theme toggle, VIN prefill (spec §6/§7).
+6. ~~Server database~~ — **DECIDED (2026-07-14, human):** Neon Postgres is
+   the persistence for user-added data, replacing localStorage behind the
+   store seam (option chosen over a hybrid offline fallback). S10 revised:
+   deterministic seed + no AI stays; offline-first is relaxed. New task T7
+   (ROL-13) ordered T2 → T7 → T3. `@neondatabase/serverless` approved as a
+   runtime dependency (constitution §2 exception).

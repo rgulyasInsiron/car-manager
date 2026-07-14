@@ -22,7 +22,9 @@ decision must comply. Conflicts are resolved here first.
   until a human approves a spec change.
 - No new runtime libraries beyond the approved stack (AGENTS.md rule 3).
   Specifically: **no Material UI (MUI) package** — the Material Design look is
-  achieved with the existing Tailwind + shadcn/ui stack.
+  achieved with the existing Tailwind + shadcn/ui stack. Human-approved
+  exception (2026-07-14): `@neondatabase/serverless` for the Neon
+  persistence (plan §8/6).
 
 ## 3. Suggestion principles
 
@@ -48,8 +50,9 @@ decision must comply. Conflicts are resolved here first.
   task is declared done; CI must stay green on `main`.
 - Secrets (AI API key) live only in `.env` (gitignored); never in code or
   `.mcp.json`.
-- Demo data is deterministic and versioned in the repo, so the demo works
-  offline-first and is reproducible.
+- Demo data is deterministic and versioned in the repo, so the demo is
+  reproducible. (Offline-first was relaxed 2026-07-14: user data persists
+  in Neon; the seed itself still renders deterministically — S10.)
 
 ## 5. Role boundaries
 

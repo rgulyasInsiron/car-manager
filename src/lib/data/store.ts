@@ -1,6 +1,6 @@
-// Client-side store: seed + localStorage merge — see docs/spec/plan.md §3.
-// Core logic is pure (unit-testable in node); only load/persist/reset touch
-// localStorage, and they no-op outside the browser.
+// Store core: seed + server-persisted user data — see docs/spec/plan.md §3.
+// Everything here is pure (unit-testable in node). Persistence lives in Neon
+// behind the /api routes; the browser talks to it via api-client.ts.
 
 import { SEED_CAR, SEED_EVENTS } from "./seed";
 import { EVENT_TYPE_LABELS, type Car, type EventType, type ServiceEvent } from "./types";
@@ -9,6 +9,12 @@ export interface StoreState {
   cars: Car[]; // seed car first, then user-added cars
   events: ServiceEvent[];
   activeCarId: string;
+}
+
+// The user-added delta served by GET /api/state; the seed comes from code.
+export interface UserData {
+  userCars: Car[];
+  userEvents: ServiceEvent[];
 }
 
 export interface NewEventInput {
@@ -27,19 +33,6 @@ export interface NewCarInput {
   nickname?: string;
 }
 
-// Only the user-added delta is persisted; the seed always comes from code.
-interface PersistedState {
-  userCars: Car[];
-  userEvents: ServiceEvent[];
-  activeCarId: string;
-}
-
-export const STORAGE_KEY = "mycar-logbook:v1";
-
-function newId(): string {
-  return crypto.randomUUID();
-}
-
 export function seedState(): StoreState {
   return {
     cars: [SEED_CAR],
@@ -48,44 +41,27 @@ export function seedState(): StoreState {
   };
 }
 
-// Merge a persisted JSON payload over the seed. Tolerant: invalid or
-// unexpected payloads fall back to the pure seed state.
-export function mergeState(raw: string | null): StoreState {
+// Merge the server's user data over the seed. Active-car selection is
+// client-side UI state; it falls back to the seed car when unknown.
+export function mergeUserData(
+  data: Partial<UserData> | null | undefined,
+  activeCarId?: string,
+): StoreState {
   const seed = seedState();
-  if (!raw) return seed;
-  try {
-    const persisted = JSON.parse(raw) as Partial<PersistedState>;
-    const userCars = Array.isArray(persisted.userCars) ? persisted.userCars : [];
-    const userEvents = Array.isArray(persisted.userEvents)
-      ? persisted.userEvents
-      : [];
-    const cars = [...seed.cars, ...userCars];
-    const activeCarId =
-      typeof persisted.activeCarId === "string" &&
-      cars.some((c) => c.id === persisted.activeCarId)
-        ? persisted.activeCarId
-        : seed.activeCarId;
-    return { cars, events: [...seed.events, ...userEvents], activeCarId };
-  } catch {
-    return seed;
-  }
+  const userCars = Array.isArray(data?.userCars) ? data.userCars : [];
+  const userEvents = Array.isArray(data?.userEvents) ? data.userEvents : [];
+  const cars = [...seed.cars, ...userCars];
+  const active =
+    activeCarId && cars.some((c) => c.id === activeCarId)
+      ? activeCarId
+      : seed.activeCarId;
+  return { cars, events: [...seed.events, ...userEvents], activeCarId: active };
 }
 
-// The persisted delta: everything not present in the seed.
-export function serializeDelta(state: StoreState): string {
-  const seedCarIds = new Set([SEED_CAR.id]);
-  const seedEventIds = new Set(SEED_EVENTS.map((e) => e.id));
-  const delta: PersistedState = {
-    userCars: state.cars.filter((c) => !seedCarIds.has(c.id)),
-    userEvents: state.events.filter((e) => !seedEventIds.has(e.id)),
-    activeCarId: state.activeCarId,
-  };
-  return JSON.stringify(delta);
-}
-
-export function addEvent(state: StoreState, input: NewEventInput): StoreState {
-  const event: ServiceEvent = {
-    id: newId(),
+// Record builders — used by the API route handlers (single id source).
+export function buildEvent(input: NewEventInput): ServiceEvent {
+  return {
+    id: crypto.randomUUID(),
     carId: input.carId,
     type: input.type,
     title: EVENT_TYPE_LABELS[input.type],
@@ -94,18 +70,25 @@ export function addEvent(state: StoreState, input: NewEventInput): StoreState {
     ...(input.costHuf !== undefined ? { costHuf: input.costHuf } : {}),
     ...(input.note ? { note: input.note } : {}),
   };
-  return { ...state, events: [...state.events, event] };
 }
 
-// Adding a car makes it the active car (spec §2a).
-export function addCar(state: StoreState, input: NewCarInput): StoreState {
-  const car: Car = {
-    id: newId(),
+export function buildCar(input: NewCarInput): Car {
+  return {
+    id: crypto.randomUUID(),
     modelId: input.modelId,
     year: input.year,
     currentKm: input.currentKm,
     ...(input.nickname ? { nickname: input.nickname } : {}),
   };
+}
+
+// Client-side state application after a successful save.
+export function applyEvent(state: StoreState, event: ServiceEvent): StoreState {
+  return { ...state, events: [...state.events, event] };
+}
+
+// Adding a car makes it the active car (spec §2a).
+export function applyCar(state: StoreState, car: Car): StoreState {
   return { ...state, cars: [...state.cars, car], activeCarId: car.id };
 }
 
@@ -134,24 +117,4 @@ export function currentKmForCar(state: StoreState, carId: string): number {
   return state.events
     .filter((e) => e.carId === carId)
     .reduce((max, e) => Math.max(max, e.odometerKm), base);
-}
-
-// --- Browser-only persistence -------------------------------------------
-
-function storage(): Storage | null {
-  return typeof window === "undefined" ? null : window.localStorage;
-}
-
-export function loadState(): StoreState {
-  return mergeState(storage()?.getItem(STORAGE_KEY) ?? null);
-}
-
-export function persist(state: StoreState): void {
-  storage()?.setItem(STORAGE_KEY, serializeDelta(state));
-}
-
-// „Demo visszaállítása": clears all user data, added cars included (spec §2a).
-export function resetDemo(): StoreState {
-  storage()?.removeItem(STORAGE_KEY);
-  return seedState();
 }

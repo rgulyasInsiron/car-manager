@@ -104,11 +104,18 @@ against these. UI strings are Hungarian; scenario language is English.
 
 ## Non-functional
 
-**S10 — Deterministic and offline**
-- Given the network is unavailable
-- When I load the dashboard and use the app
-- Then everything works: no runtime AI/API dependency exists, and the same
-  seed always produces the same statuses and suggestions.
+**S10 — Deterministic, no AI** *(revised 2026-07-14: offline-first relaxed
+with the Neon persistence decision)*
+- Given a database with no user data
+- When I load the dashboard
+- Then the seeded statuses and suggestions are always identical, and no
+  AI/LLM API is called anywhere in the app.
+
+**S18 — User data persists server-side**
+- Given I add an event (or a car)
+- When I reload the page or open the app in another browser
+- Then the added data is still there (persisted in Neon), and „demo
+  visszaállítása" removes it everywhere while the seed remains.
 
 **S11 — Gates are green**
 - Given the implemented feature set

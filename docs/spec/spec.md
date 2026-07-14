@@ -165,9 +165,10 @@ The app starts pre-seeded and works without any user setup:
   above), and each row carries its source (plan §8/3).
 - Model catalog: a curated list of ~8–10 common models for the add-car form
   (§2a), each with its own service-interval table or the generic default.
-- Seed data lives in a versioned module; user-added cars and events are
-  persisted client-side (see `plan.md`) on top of the seed. The seeded
-  Octavia is always restored by the demo reset.
+- Seed data lives in a versioned module; user-added cars and events persist
+  **server-side in Neon Postgres** (scope change 2026-07-14; see `plan.md`
+  §3) on top of the code-resident seed. The seeded Octavia is always
+  restored by the demo reset (which deletes the user rows).
 
 ## 5. UI requirements
 
@@ -186,7 +187,8 @@ The app starts pre-seeded and works without any user setup:
 
 Authentication, multi-user (multi-car moved into scope 2026-07-14, see §2a),
 car deletion, event editing/deletion, JSON export/import, timeline
-filtering, manual theme toggle, server database (may arrive in a later
+filtering, manual theme toggle (the server database moved INTO scope
+2026-07-14: Neon Postgres persists user data, see §4 and plan §3) (may arrive in a later
 workshop block), notifications, PDF export, service-shop integrations, chat
 UI, native mobile — and, until a human approves an AI API key: **any runtime
 LLM call**, free-text event parsing, photo/receipt OCR.
