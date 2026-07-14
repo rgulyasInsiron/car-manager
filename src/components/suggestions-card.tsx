@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -7,10 +8,11 @@ import {
 import type { Suggestion } from "@/lib/logic/suggestions";
 import { cn } from "@/lib/utils";
 
-import { SEVERITY_STYLES } from "./severity";
+import { SEVERITY_LABELS, SEVERITY_STYLES } from "./severity";
 
 // „Következő javasolt szervizek" (spec §3): up to 5 advisory bullets in
-// descending urgency, each with its severity dot.
+// descending urgency, each with a severity chip (dot + label, never color
+// alone — same Badge pattern as the status cards).
 export function SuggestionsCard({ suggestions }: { suggestions: Suggestion[] }) {
   return (
     <Card>
@@ -25,21 +27,27 @@ export function SuggestionsCard({ suggestions }: { suggestions: Suggestion[] }) 
           </p>
         ) : (
           <ul className="flex flex-col gap-3">
-            {suggestions.map((suggestion) => (
-              <li
-                key={suggestion.type}
-                className="flex items-start gap-2.5 text-sm"
-              >
-                <span
-                  className={cn(
-                    "mt-1.5 size-2 shrink-0 rounded-full",
-                    SEVERITY_STYLES[suggestion.severity].dot,
-                  )}
-                  aria-hidden
-                />
-                <span>{suggestion.text}</span>
-              </li>
-            ))}
+            {suggestions.map((suggestion) => {
+              const styles = SEVERITY_STYLES[suggestion.severity];
+              return (
+                <li
+                  key={suggestion.type}
+                  className="flex items-start gap-2.5 text-sm"
+                >
+                  <Badge
+                    variant="secondary"
+                    className={cn("shrink-0", styles.softBg, styles.text)}
+                  >
+                    <span
+                      className={cn("size-1.5 rounded-full", styles.dot)}
+                      aria-hidden
+                    />
+                    {SEVERITY_LABELS[suggestion.severity]}
+                  </Badge>
+                  <span>{suggestion.text}</span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </CardContent>
